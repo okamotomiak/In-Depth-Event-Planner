@@ -7,21 +7,30 @@ function onOpen() {
   const ui = SpreadsheetApp.getUi();
   
   // Create the Event Planner Setup menu with updated order
-  ui.createMenu('Event Planner Setup')
-    .addItem('Update Dashboard', 'setupDashboard')
-    .addSeparator()
-    .addItem('Generate AI Tasks', 'generateAITasksWithSchedule')
-    .addItem('Generate Preliminary Schedule', 'generatePreliminarySchedule')
+    ui.createMenu('Event Planner Setup')
+      .addItem('Update Dashboard', 'setupDashboard')
+      .addSeparator()
+      .addItem('Generate AI Tasks', 'generateAITasksWithSchedule')
+      .addItem('Generate Preliminary Schedule', 'generatePreliminarySchedule')
     .addSeparator()
     .addItem('Create/Reset Cue Builder Sheet', 'setupCueBuilderSheet') // <-- New
     .addItem('Generate Professional Cue Sheet', 'generateProfessionalCueSheet') // <-- Updated
     .addSeparator()
-    .addItem('Generate Google Forms', 'showFormGeneratorDialog')
-    .addItem('Update All Dropdowns', 'updateAllDropdowns')
-        .addSubMenu(SpreadsheetApp.getUi().createMenu('Tutorial System')
-      .addItem('Create Tutorial Overlays', 'createFullTutorialSystem')
-      .addItem('Remove Tutorial Overlays', 'removeTutorialSystem'))
-    .addToUi();
+      .addItem('Generate Google Forms', 'showFormGeneratorDialog')
+      .addItem('Update All Dropdowns', 'updateAllDropdowns')
+          .addSubMenu(SpreadsheetApp.getUi().createMenu('Tutorial System')
+        .addItem('Create Tutorial Overlays', 'createFullTutorialSystem')
+        .addItem('Remove Tutorial Overlays', 'removeTutorialSystem'))
+      .addToUi();
+
+  // Show a welcome message if the spreadsheet appears blank
+  if (isSpreadsheetBlank()) {
+    ui.alert(
+      'Welcome to Event Planner Pro',
+      'This sheet looks empty. Explore the "Event Planner Setup" menu and start with the Quick Event Setup to begin planning.',
+      ui.ButtonSet.OK
+    );
+  }
 
 }
 
@@ -597,4 +606,22 @@ function getReminderLeadTime() {
     Logger.log(`Error getting reminder lead time: ${error}`);
     return 2; // Default to 2 days
   }
+}
+
+/**
+ * Determines if the spreadsheet is completely blank
+ * @return {boolean} True if blank, false otherwise
+ */
+function isSpreadsheetBlank() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  if (sheets.length !== 1) return false;
+
+  const sheet = sheets[0];
+  const dataRange = sheet.getDataRange();
+  const hasOneCell =
+    dataRange.getNumRows() === 1 && dataRange.getNumColumns() === 1;
+  const isEmpty = dataRange.getValue() === '';
+
+  return hasOneCell && isEmpty;
 }
